@@ -1,0 +1,15 @@
+.body__content #content__form {
+    max-width: 701px;
+    background-color: rgba(255, 255, 255, .5);
+}
+
+.body__screen .screen__label {
+    display: block;
+    font-size: 19px;
+    word-spacing: 10px;
+    letter-spacing: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 15px 0;
+    background: #ff9800;
+}
