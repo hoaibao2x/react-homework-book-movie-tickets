@@ -81,4 +81,9 @@
 
 .table td {
     max-width: 10px;
+    vertical-align: middle;
+}
+
+ul {
+    list-style: none;
 }

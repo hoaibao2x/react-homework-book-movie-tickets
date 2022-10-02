@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import './BodyStyling/BodyStyling.css'
 import '../../../js/disabledScrollEvent.js'
+import SeatsList from './ChildsComponent/SeatsList'
+import InputFormComponent from './ChildsComponent/InputFormComponent'
+import ResultTableComponent from './ChildsComponent/ResultTableComponent'
 
 export default class BodyComponent extends Component {
 
@@ -36,8 +39,8 @@ export default class BodyComponent extends Component {
         { "soGhe": "A8", "gia": 75000, "daDat": false },
         { "soGhe": "A9", "gia": 75000, "daDat": false },
         { "soGhe": "A10", "gia": 75000, "daDat": false },
-        { "soGhe": "A11", "gia": 0, "daDat": true },
-        { "soGhe": "A12", "gia": 0, "daDat": true }
+        { "soGhe": "A11", "gia": 75000, "daDat": false },
+        { "soGhe": "A12", "gia": 75000, "daDat": false }
       ]
     },
     {
@@ -195,7 +198,7 @@ export default class BodyComponent extends Component {
     seatsArr: [],
     confirmSelected: false,
     displayWarnTitle: 'none',
-    test: ''
+    // test: ''
   }
 
   handleChange = (name, value) => {
@@ -217,27 +220,27 @@ export default class BodyComponent extends Component {
 
   checkItem = (value) => {
     for (let i = 0; i < this.state.seatsArr.length; i++) {
-      if (value === this.state.seatsArr[i]) {
+      if (value === this.state.seatsArr[i].soGhe) {
         return '#ff9800'
       }
     }
   }
 
-  addSeat = (seatName) => {
+  addSeat = (seat) => {
     if (this.state.displayWarnTitle === 'block') {
       let { numberOfSeat, seatsArr } = this.state;
-      // Check seatName is exist seatsArr ?
+      // Check seat is exist seatsArr ?
       for (let i = 0; i < seatsArr.length; i++) {
-        if (seatName === seatsArr[i]) {
-          seatsArr.pop(seatName);
+        if (seat === seatsArr[i]) {
+          seatsArr.pop(seat);
         }
       }
       if (seatsArr.length < numberOfSeat) {
-        seatsArr.push(seatName);
+        seatsArr.push(seat);
         this.setState({
           seatsArr: [...seatsArr],
         })
-        this.checkItem(seatName)
+        this.checkItem(seat)
       } else {
         let tempArr = seatsArr.splice(0, numberOfSeat);
         this.setState({
@@ -254,47 +257,18 @@ export default class BodyComponent extends Component {
         confirmSelected: true
       })
     }
-
   }
 
-  renderResult = () => {
-    let { userName, numberOfSeat, seatsArr, confirmSelected } = this.state;
-    if (confirmSelected && seatsArr.length > 0) {
-      return <>
-        <td>{userName}</td>
-        <td>{numberOfSeat}</td>
-        <td>
-          {seatsArr.map((item) => {
-            return item + ' '
-          })}
-        </td>
-      </>
-    }
-  }
-
-  renderSeatsList = () => {
-    return this.seatsList.map((seatRow, index) => {
-      let { hang } = seatRow;
-      return <table key={`table-${index}`} className="table table-borderless mb-0 seat__table">
-        <tbody>
-          <tr className='seat__row'>
-            <td className='text-left font-weight-bold'>{hang}</td>
-            {/* Render seat number */}
-            {seatRow.danhSachGhe.map((seatName, index) => {
-              return <td key={`seat-${index}`}>
-                <span onClick={() => {
-                  this.addSeat(seatName.soGhe)
-                }} className='seat'
-                  style={{ background: `${this.checkItem(seatName.soGhe)}` }} >
-                  {seatName.soGhe}
-                </span>
-              </td>
-            })}
-          </tr>
-        </tbody>
-      </table>
+  totalPrice = () => {
+    let amountPrice = 0;
+    this.state.seatsArr.map((item) => {
+      amountPrice += item.gia;
     })
+
+    return amountPrice;
   }
+
+
 
   render() {
     return (
@@ -302,73 +276,14 @@ export default class BodyComponent extends Component {
         <div className="body__content">
           <div id='content__form' className="card container mx-auto my-5">
             <div className="card-body">
-              <span className='body__title font-weight-bold text-left d-block py-3'>Fill The Required Details Below And Select Your Seats</span>
-              {/* Input fields */}
-              <div className="form-group body__input__fields">
-                <div className="row">
-                  <div className="col-md-8">
-                    <label className='d-block text-left font-weight-bold' htmlFor="name__input">Name <span className='text-danger'>*</span></label>
-                    <input onChange={(event) => {
-                      let { name, value } = event.target;
-                      this.handleChange(name, value);
-                    }} id='name__input' name='userName' type="text" className="form-control" />
-                  </div>
-                  <div className="col-md-4">
-                    <label className='d-block text-left font-weight-bold' htmlFor="number__seat__input">Number of Seats <span className='text-danger'>*</span></label>
-                    <input onChange={(event) => {
-                      let { name, value } = event.target;
-                      this.handleChange(name, value);
-                    }} id='number__seat__input' name='numberOfSeat' type="number" min={1} className="form-control" />
-                  </div>
-                </div>
-              </div>
-              {/* Action button */}
-              <div className="body__select__btn py-3">
-                <button onClick={() => {
-                  this.confirmInput()
-                }} className='btn btn-info text-left d-block'>Start Selecting</button>
-              </div>
-              {/* Seat status */}
-              <div className="body__seat__label d-block text-left">
-                <span className='seat__status selected__seat'>Selected Seat</span>
-                <span className='seat__status reserved__seat'>Reserved Seat</span>
-                <span className='seat__status empty__seat'>Empty Seat</span>
-              </div>
-              {/* Warn label */}
-              <div className="body__warn" style={{ display: `${this.state.displayWarnTitle}` }}>
-                <span className='warn__title d-block w-50 mx-auto my-5'>Please Select your Seats NOW!</span>
-              </div>
+
+              {/* Input form */}
+              <InputFormComponent confirmInput={this.confirmInput} handleChange={this.handleChange} />
+
               {/* Seats List */}
-              <div className="body__seats">
-                {this.renderSeatsList()}
-              </div>
-              {/* Screen label */}
-              <div className="body__screen">
-                <span className='screen__label'>screen this way</span>
-              </div>
-              {/* Confirm button */}
-              <div className="body__confirm__btn py-4">
-                <button onClick={() => {
-                  this.confirmFnc()
-                }} className='btn btn-success'>Confirm Selection</button>
-              </div>
-              {/* Table */}
-              <div className="body__table">
-                <table className="table bg-dark text-white table-bordered">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Number of Seats</th>
-                      <th>Seats</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      {this.renderResult()}
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <SeatsList displayWarnTitle={this.state.displayWarnTitle} seatsList={this.seatsList} addSeat={this.addSeat} checkItem={this.checkItem} confirmFnc={this.confirmFnc} />
+
+              <ResultTableComponent userName={this.state.userName} numberOfSeat={this.state.numberOfSeat} seatsArr={this.state.seatsArr} confirmSelected={this.state.confirmSelected} totalPrice = {this.totalPrice}/>
             </div>
           </div>
         </div>
